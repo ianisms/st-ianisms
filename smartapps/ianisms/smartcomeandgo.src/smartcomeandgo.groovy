@@ -30,8 +30,9 @@ definition(
     author: "Ian N. Bennett",
     description: "On arrival: unlocks the door and after door opens, turns on lights and announces arrival",
     category: "Safety & Security",
-    iconUrl: "http://lagaiphone.se/wp-content/uploads/2015/03/logo2.png",
-    iconX2Url: "http://lagaiphone.se/wp-content/uploads/2015/03/logo2.png",
+    iconUrl: "https://lh6.ggpht.com/iLGaQaXCm23ye7jjtAZRIFMpTYAVaSRZ3F74OaOHKuIGB9edj-zvBAbFdGmaduO2cEU=w300",
+    iconX2Url: "https://lh6.ggpht.com/iLGaQaXCm23ye7jjtAZRIFMpTYAVaSRZ3F74OaOHKuIGB9edj-zvBAbFdGmaduO2cEU=w300",
+    iconX3Url: "https://lh6.ggpht.com/iLGaQaXCm23ye7jjtAZRIFMpTYAVaSRZ3F74OaOHKuIGB9edj-zvBAbFdGmaduO2cEU=w300",
     oauth: true
 )
 
