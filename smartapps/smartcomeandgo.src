@@ -155,13 +155,15 @@ def contactOpen(evt) {
 
 def lockUnlocked(evt)
 {         
+	state.presence = "Unknown guest"
+	state.newArrival = true
     log("lockUnlocked: ${evt.displayName}, manually unlocked")
     welcomeHome()
 }
 
 private welcomeHome() {
 	if(state.presence != null && state.newArrival == true) {
-        log("motionActive: motion after arrival")
+        log("welcomeHome: welcomeHome after arrival")
 
         sendNotificationEvent("Welcome home ${state.presence}") 
         
