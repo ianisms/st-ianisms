@@ -78,7 +78,7 @@ def init() {
         subscribe(app, appTouch)     
         subscribe(presenceSensors, "presence.present", presence)
         subscribe(doorContacts, "contact.open", contactOpen)
-        subscribe(locks, "lock.unlock", lockUnlocked")   
+        subscribe(locks, "lock.unlock", lockUnlocked)   
 
         if(enableMotionControl == "true") {
             log("init: motion control enabled...")
