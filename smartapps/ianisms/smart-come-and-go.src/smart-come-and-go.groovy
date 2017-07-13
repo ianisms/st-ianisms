@@ -40,7 +40,7 @@ preferences {
     section("Basics") {
         input "enableApp", "boolean", title: "Enable App?", required: true, defaultValue: true
         input "presenceSensors", "capability.presenceSensor", title: "Which presence sensor(s)?", multiple: true
-        input "presenceSensorNamePattern", "text", title: "Presnse sensor name pattern", description: "Ex.: 's for Joe's iPhone will resolve to Joe", multiple: false, required: false, capitalization: "none"
+        input "presenceSensorNamePattern", "text", title: "Presense sensor name pattern", description: "Ex.: 's for Joe's iPhone will resolve to Joe", multiple: false, required: false, capitalization: "none"
         input "locks", "capability.lock", title: "Which Lock(s)?", multiple: true
         input "doorContacts", "capability.contactSensor", title: "Which Door Contact(s)?", multiple: true        
     }
@@ -88,7 +88,7 @@ def init() {
         subscribe(app, appTouch)     
         subscribe(presenceSensors, "presence.present", presence)
         subscribe(doorContacts, "contact.open", contactOpen)
-        subscribe(locks, "lock.unlock", lockUnlocked)   
+        subscribe(locks, "lock", lockHandler)   
 
         if(enableMotionControl == "true") {
             log("init: motion control enabled...")
@@ -101,9 +101,8 @@ def init() {
             subscribe(location, "sunset", sunsetHandler)
         }
     
-        if (enableGreetings == "true" && doorContacts != null) {
+        if(enableGreetings == "true") {
             log("init: greetings after arrival enabled...")
-            subscribe(doorContacts, "contact.open", contactOpen)
         }
     } else {        
         log("init: App is disabled...")
@@ -139,16 +138,6 @@ def motionActive(evt) {
     }
 }
 
-def sunriseHandler(evt) {
-    log("sunriseHandler")
-    state.isDark = false
-}
-
-def sunsetHandler(evt) {
-    log("sunsetHandler")
-    state.isDark = true
-}
-
 def contactOpen(evt) {	    
     if(state.presence != null && state.newArrival == true) { 
         state.newArrival = false
@@ -163,12 +152,24 @@ def contactOpen(evt) {
     }
 }
 
-def lockUnlocked(evt)
-{         
-	state.presence = "Unknown guest"
-	state.newArrival = true
-    log("lockUnlocked: ${evt.displayName}, manually unlocked")
-    welcomeHome()
+def lockHandler(evt)
+{   
+	if (state.presence == null && state.newArrival == false && evt.value == "unlocked") {
+        state.presence = "Unknown guest"
+        state.newArrival = true
+        log("lockUnlocked: ${evt.displayName}, manually unlocked")
+        welcomeHome()
+   }
+}
+
+def sunriseHandler(evt) {
+    log("sunriseHandler")
+    state.isDark = false
+}
+
+def sunsetHandler(evt) {
+    log("sunsetHandler")
+    state.isDark = true
 }
 
 private welcomeHome() {
