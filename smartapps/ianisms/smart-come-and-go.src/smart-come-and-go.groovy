@@ -42,7 +42,8 @@ preferences {
         input "presenceSensors", "capability.presenceSensor", title: "Which presence sensor(s)?", multiple: true
         input "presenceSensorNamePattern", "text", title: "Presense sensor name pattern", description: "Ex.: 's for Joe's iPhone will resolve to Joe", multiple: false, required: false, capitalization: "none"
         input "locks", "capability.lock", title: "Which Lock(s)?", multiple: true
-        input "doorContacts", "capability.contactSensor", title: "Which Door Contact(s)?", multiple: true        
+        input "doorContacts", "capability.contactSensor", title: "Which Door Contact(s)?", multiple: true  
+        input "enableGuestAccess", "boolean", title: "Enable Guest Access?", required: true, defaultValue: true      
     }
         
     section("Motion Control") {
@@ -154,12 +155,23 @@ def contactOpen(evt) {
 
 def lockHandler(evt)
 {   
-	if (state.presence == null && state.newArrival == false && evt.value == "unlocked") {
-        state.presence = "Unknown guest"
-        state.newArrival = true
-        log("lockUnlocked: ${evt.displayName}, manually unlocked")
-        welcomeHome()
-   }
+	if( evt.value == "unlocked" && state.presence == null && state.newArrival == false && anyFamilyHome() == false) {	
+		def warningMsg = "A guest has unlocked ${evt.displayName} while family is not home."
+
+		if (enableGuestAccess == "true") {
+			state.presence = "Guest"
+			state.newArrival = true
+			warningMsg += "  Guest access is enabled so, performing welcomeHome...")
+			welcomeHome()
+		} else {			
+			warningMsg += "  Guest access is not enabled so, not performing welcomeHome!")
+		}
+
+		log("lockUnlocked: ${warningMsg}")
+        if (enableNotifications == "true") {            
+            sendPush("${warningMsg}")
+        }
+	}
 }
 
 def sunriseHandler(evt) {
@@ -180,7 +192,7 @@ private welcomeHome() {
         
 		sendLocationEvent(name: "alarmSystemStatus", value: "off")
         
-        log("motionActive: disarmed alarm")
+        log("welcomeHome: disarmed alarm")
 
         def anyLocked = locks.count{it.currentLock == "unlocked"} != locks.size()
 
@@ -192,10 +204,14 @@ private welcomeHome() {
         }
 
         if (enableLightControl == "true" && state.isDark == true) {
-            log("motionActive: turning on lights when dark")
+            log("welcomeHome: turning on lights when dark")
             lightsOn()
         }
     }
+}
+
+private anyFamilyHome() {
+	return (presenceSensors.count{it.presence == "present"} != 0)
 }
 
 private lightsOn() {
