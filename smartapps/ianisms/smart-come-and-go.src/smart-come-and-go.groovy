@@ -119,6 +119,7 @@ def presence(evt)
 { 
     state.presence = evt.displayName.toLowerCase()
     state.newArrival = true
+	state.guest = false
     def endIndex = state.presence.length()
     if(presenceSensorNamePattern != null) {
         endIndex = state.presence.indexOf(presenceSensorNamePattern)
@@ -147,10 +148,15 @@ def contactOpen(evt) {
         log("contactOpen: ${evt.displayName} open after new arrival of ${state.presence}")
         
         if (enableGreetings == "true" && speechDevices != null) {   
-            speak("Welcome home, ${state.presence}")
+			def welcomeMsg = "Welcome home, ${state.presence}"
+			if(state.guest == true) {
+				welcomeMsg += ".  The family has been notified of your arrival."
+			}
+            speak(welcomeMsg)
         }
 
-        state.presence = null
+        state.presence = null		
+		state.guest = false
     }
 }
 
@@ -161,6 +167,7 @@ def lockHandler(evt)
 		def warningMsg = "A guest has unlocked ${evt.displayName} while family is not home."
 
 		if (enableGuestAccess == "true") {
+			state.guest = true
 			state.presence = "Guest"
 			state.newArrival = true
 			warningMsg += "  Guest access is enabled so, performing welcomeHome..."
