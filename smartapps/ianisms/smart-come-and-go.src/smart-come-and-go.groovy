@@ -161,10 +161,10 @@ def lockHandler(evt)
 		if (enableGuestAccess == "true") {
 			state.presence = "Guest"
 			state.newArrival = true
-			warningMsg += "  Guest access is enabled so, performing welcomeHome...")
+			warningMsg += "  Guest access is enabled so, performing welcomeHome..."
 			welcomeHome()
 		} else {			
-			warningMsg += "  Guest access is not enabled so, not performing welcomeHome!")
+			warningMsg += "  Guest access is not enabled so, not performing welcomeHome!"
 		}
 
 		log("lockUnlocked: ${warningMsg}")
@@ -211,7 +211,7 @@ private welcomeHome() {
 }
 
 private anyFamilyHome() {
-	return (presenceSensors.count{it.presence == "present"} != 0)
+	return (presenceSensors.count{it.currentPresence == "present"} != 0)
 }
 
 private lightsOn() {
