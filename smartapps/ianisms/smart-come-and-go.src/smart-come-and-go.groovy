@@ -111,7 +111,8 @@ def init() {
 }
 
 def appTouch(evt) {
-    speak("state.presence is ${state.presence}, state.newArrival is ${state.newArrival}, and state.isDark is ${state.isDark}")
+	def afh = anyFamilyHome()
+    speak("state.presence is ${state.presence}, state.newArrival is ${state.newArrival}, and state.isDark is ${state.isDark}.  anyFamilyHome is ${afh}")
 }
 
 def presence(evt)
@@ -155,7 +156,8 @@ def contactOpen(evt) {
 
 def lockHandler(evt)
 {   
-	if( evt.value == "unlocked" && state.presence == null && state.newArrival == false && anyFamilyHome() == false) {	
+	def afh = anyFamilyHome()
+	if(evt.value == "unlocked" && afh == false && state.presence == null && state.newArrival == false) {	
 		def warningMsg = "A guest has unlocked ${evt.displayName} while family is not home."
 
 		if (enableGuestAccess == "true") {
@@ -211,7 +213,7 @@ private welcomeHome() {
 }
 
 private anyFamilyHome() {
-	return (presenceSensors.count{it.currentPresence == "present"} != 0)
+	return (presenceSensors.count{it.currentPresence == "present"} > 0)
 }
 
 private lightsOn() {
