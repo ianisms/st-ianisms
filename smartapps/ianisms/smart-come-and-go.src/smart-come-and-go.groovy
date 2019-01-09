@@ -28,7 +28,7 @@ definition(
     name: "Smart Come and Go",
     namespace: "ianisms",
     author: "Ian N. Bennett",
-    description: "On arrival: unlocks the door and after door opens, turns on lights and announces arrival",
+    description: "On arrival: when motion is detected, unlocks the door and after door opens, turns on lights and announces arrival",
     category: "Safety & Security",
     iconUrl: "https://lh6.ggpht.com/iLGaQaXCm23ye7jjtAZRIFMpTYAVaSRZ3F74OaOHKuIGB9edj-zvBAbFdGmaduO2cEU=w300",
     iconX2Url: "https://lh6.ggpht.com/iLGaQaXCm23ye7jjtAZRIFMpTYAVaSRZ3F74OaOHKuIGB9edj-zvBAbFdGmaduO2cEU=w300",
@@ -49,6 +49,10 @@ preferences {
     section("Motion Control") {
         input "enableMotionControl", "boolean", title: "Use Motion Sensor to Control Unlock, etc?", defaultValue: true
         input "motionSensors", "capability.motionSensor", title: "Which Motion Sensor(s)?", multiple: true
+    }
+        
+    section("Cameras") {
+        input "cameras", "capability.videoStream", title: "Which Cameras(s)?", multiple: true, required: false
     }
         
     section("Light Control") {
@@ -112,7 +116,8 @@ def init() {
 
 def appTouch(evt) {
 	def afh = anyFamilyHome()
-    speak("state.presence is ${state.presence}, state.newArrival is ${state.newArrival}, and state.isDark is ${state.isDark}.  anyFamilyHome is ${afh}")
+	def mode = getLocation().getCurrentMode()
+    speak("state.presence is ${state.presence}, state.newArrival is ${state.newArrival}, and state.isDark is ${state.isDark}.  anyFamilyHome is ${afh} and mode is ${mode}")
 }
 
 def presence(evt)
@@ -201,6 +206,8 @@ private welcomeHome() {
         
 		sendLocationEvent(name: "alarmSystemStatus", value: "off")
         
+        setLocationMode("Home");
+        
         log("welcomeHome: disarmed alarm")
 
         def anyLocked = locks.count{it.currentLock == "unlocked"} != locks.size()
@@ -210,6 +217,11 @@ private welcomeHome() {
             if (enableNotifications == "true") {            
                 sendPush("Unlocked locks on arrival of ${state.presence}")
             }
+        }
+        
+        if(cameras) {
+            cameras.off()
+            log("welcomeHome: turned off ${cameras}")
         }
 
         if (enableLightControl == "true" && state.isDark == true) {
