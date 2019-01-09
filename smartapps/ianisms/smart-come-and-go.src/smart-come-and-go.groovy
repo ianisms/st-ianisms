@@ -58,7 +58,7 @@ preferences {
 
     section("Greetings and Notfications") {
         input "enableGreetings", "boolean", title: "Greet on Arrival?", defaultValue: true
-        input "speechDevices", "capability.audioNotification", title: "Speech Device(s):", multiple: true, required: false
+        input "speechDevices", "capability.speechSynthesis", title: "Speech Device(s):", multiple: true, required: false
         input "enableNotifications", "boolean", title: "Send push notifications?", defaultValue: true
     }
 
@@ -239,7 +239,7 @@ private speak(msg) {
 
     if(speechDevices != null) {
         log("speak: speaking ${msg} on ${speechDevices}")      
-        speechDevices.playTextAndResume(msg, 100)
+        speechDevices.setVolumeSpeakAndRestore(100, msg)
     }
 }
 
