@@ -248,15 +248,13 @@ private lightsOn() {
 }
 
 private speak(msg) {
-
     if(speechDevices != null) {
         log("speak: speaking ${msg} on ${speechDevices}")      
         speechDevices.setVolumeSpeakAndRestore(100, msg)
     }
 }
 
-private log(msg, level = logLevel) {
-    
+private log(msg, level = logLevel) {    
     switch(level) {
         case "Info":
             log.info(msg)  
