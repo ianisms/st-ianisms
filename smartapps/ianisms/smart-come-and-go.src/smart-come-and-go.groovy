@@ -136,7 +136,7 @@ def present(evt)
 		welcomeHome()
 	}
         
-    log("presence: arrival of ${state.presence}")
+    log("present: arrival of ${state.presence}")
 
 }
 
@@ -147,9 +147,12 @@ def notPresent(evt)
     if(presenceSensorNamePattern != null) {
         def notPresentEndIndex = notPresent.indexOf(presenceSensorNamePattern)
         notPresent = notPresent.substring(0, (notPresentEndIndex > 0 ? notPresentEndIndex : notPresent.length()))
-    }
+    }    
     
-    if(notPresent == state.presence)  {
+    log("notPresent: ${notPresent} has left")
+    
+    if(notPresent == state.presence)  {    
+    	log("notPresent: ${notPresent} ==  ${state.presence}, clearing state")
     	state.presence = null
         state.newArrival = false
         state.guest = false
