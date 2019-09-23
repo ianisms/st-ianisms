@@ -91,7 +91,8 @@ def init() {
         state.isDark = false
 
         subscribe(app, appTouch)     
-        subscribe(presenceSensors, "presence.present", presence)
+        subscribe(presenceSensors, "presence.present", present)
+        subscribe(presenceSensors, "presence.not present", notPresent)
         subscribe(doorContacts, "contact.open", contactOpen)
         subscribe(locks, "lock", lockHandler)   
 
@@ -120,12 +121,12 @@ def appTouch(evt) {
     speak("state.presence is ${state.presence}, state.newArrival is ${state.newArrival}, and state.isDark is ${state.isDark}.  anyFamilyHome is ${afh} and mode is ${mode}")
 }
 
-def presence(evt)
+def present(evt)
 { 
     state.presence = evt.displayName.toLowerCase()
     state.newArrival = true
 	state.guest = false
-    def endIndex = state.presence.length()
+    
     if(presenceSensorNamePattern != null) {
         endIndex = state.presence.indexOf(presenceSensorNamePattern)
         state.presence = state.presence.substring(0, (endIndex > 0 ? endIndex : state.presence.length()))
@@ -137,6 +138,22 @@ def presence(evt)
         
     log("presence: arrival of ${state.presence}")
 
+}
+
+def notPresent(evt)
+{ 
+	def notPresent = evt.displayName.toLowerCase()
+  
+    if(presenceSensorNamePattern != null) {
+        def notPresentEndIndex = notPresent.indexOf(presenceSensorNamePattern)
+        notPresent = notPresent.substring(0, (notPresentEndIndex > 0 ? notPresentEndIndex : notPresent.length()))
+    }
+    
+    if(notPresent == state.presence)  {
+    	state.presence = null
+        state.newArrival = false
+        state.guest = false
+    }
 }
 
 def motionActive(evt) {
